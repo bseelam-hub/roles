@@ -1,0 +1,26 @@
+#---
+## tasks file for postgresql
+#- name: Install postgresql
+#  yum:
+#   name: https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-redhat96-9.6-3.noarch.rpm
+#   state: present
+#   name: postgresql96-server
+#   state: present
+#  become: True
+#- name: Change the postgres home directory
+#  shell: usermod -d /local/apps/pgsql postgres
+#  become: True
+#- name: move the data directory
+#  shell: mv /var/lib/pgsql /local/apps/
+#  become: True
+#- name: change the PGDATA
+#  shell: sed -i "s|/var/lib|/local/apps|g" /lib/systemd/system/postgresql-9.6.service /usr/pgsql-9.6/bin/postgresql96-setup
+#  become: True
+#- name: Intiate the database
+#  shell: su - postgres -c "/usr/pgsql-9.6/bin/initdb -D /local/apps/pgsql/9.6/data"
+#  become: True
+#- name: Enable the postgre service
+#  shell: sudo systemctl enable postgresql-9.6.service
+#  shell: sudo systemctl start postgresql-9.6.service
+
+

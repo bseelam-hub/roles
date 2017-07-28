@@ -1,0 +1,70 @@
+---
+# tasks file for jenkins
+#- name: Ensure jenkins home dir is created
+#  become_user: root
+#  file:
+#    path: "{{ jenkins_home }}"
+#    mode: 0777
+#    owner: "{{ jenkins_user }}"_
+#    group: "{{ jenkins_group }}"
+#    state: directory
+#  become_user: root 
+# yum: name="{{ cloudbees_repo_urli }}" state=present
+#- name: Import jenkins repository
+#  shell: wget -O "{{ jenkins_repo_url }}"  
+#  shell: rpm --import "{{ jenkins_repo_key }}" 
+#  become: True
+#- name: Install Jenkins
+#  yum:
+#    name: jenkins
+#    state: present
+#  become: True
+#- name: Jenkins is running
+#  service:
+#    name: jenkins
+#    state: restarted
+#  become: True
+#  yum: name=jenkins state-present
+#- service: name=jenkins state=started 
+#- name: start the service 
+#  state: restart
+
+#- name: Add jenkins Repo
+#  yum_repository:
+#   name: jenkins
+#   description: Cloudbees-jenkins-repo
+#   baseurl: "{{ jenkins_repo_url }}"
+#   gpgkey: "{{ jenkins_repo_key }}"
+#   gpgcheck: yes 
+#  become: True
+- name: Add Cloudbees Jenkins repo
+  get_url: 
+    url: "{{ jenkins_repo_url }}"
+    dest: "{{ jenkins_repo_dir }}"
+  become: True
+- name: Import the gpg Key 
+  shell: rpm --import "{{ jenkins_repo_key }}"
+  become: True 
+- name: Install jenkins
+  yum: 
+   name: jenkins
+   state: present
+  become: True
+- name: change the Jenkins home 
+  lineinfile:
+   path: /etc/sysconfig/jenkins
+   regexp: '^JENKINS_HOME='
+   line: 'JENKINS_HOME=/local/apps/jenkins'
+  become: True
+- name: Move the jenkins home
+  shell: mv /var/lib/jenkins /local/apps
+  become: True
+- name: Start the Jenkins Service
+  service:
+   name: jenkins
+   state: started
+  become: True
+
+   
+   
+   

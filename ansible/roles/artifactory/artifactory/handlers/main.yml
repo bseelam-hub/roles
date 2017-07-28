@@ -1,0 +1,5 @@
+---
+# handlers file for artifactory
+- name: restart artifactory
+  service: name=artifactory state=restarted
+  become: True

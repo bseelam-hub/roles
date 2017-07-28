@@ -1,0 +1,118 @@
+---
+# tasks file for artifactory
+#- name: Installing required packages
+#  yum: state=present name={{ item }}
+#  with_items:
+#  - java
+#  - wget
+#  - telnet
+#  become: True
+#- name: Add Artifactory Repo
+#  get_url:
+#    url: "{{ artifactory_repo_url }}"
+#    dest: "{{ artifactory_repo_dir }}"
+#  become: True
+#- name: Install Artifactory
+#  yum:
+#   name: jfrog-artifactory-pro
+#   state: present
+#  become: True
+
+- name: Creates directory
+  file: path=/local state=directory
+  become: True
+
+- name: Creates directory
+  file: path=/local/apps state=directory
+  become: True
+
+- name: Move Artifactory default storage location to /local/apps/
+  command: mv /opt/jfrog/ /local/apps/
+  become: True
+
+- name: Remove syslinks of tomcat,misc and webapps folders in /var/opt/jfrog/artifactory
+  file: path={{ item }}  state=absent
+  with_items:
+  - /var/opt/jfrog/artifactory/tomcat
+  - /var/opt/jfrog/artifactory/webapps
+  - /var/opt/jfrog/artifactory/misc
+  become: True
+
+
+- name: symlink /var/opt/jfrog/artifactory/folders to /local/apps/jfrog/artifactory/folders respectively
+  file: src=/local/apps/jfrog/artifactory/{{ item.src }}/ dest=/var/opt/jfrog/artifactory/{{ item.dest }} force=true state=link    	
+  with_items:
+  - src: tomcat
+    dest: tomcat
+  - src: webapps
+    dest: webapps
+  - src: misc
+    dest: misc
+  become: True
+
+- name: Change the permissions for /var/opt/jfrog/artifactory/ folders
+  file: src=/local/apps/jfrog/artifactory/{{ item.src }}/ dest=/var/opt/jfrog/artifactory/{{ item.dest }} owner=artifactory group=artifactory
+  with_items:
+  - src: tomcat
+    dest: tomcat
+  - src: webapps
+    dest: webapps
+  - src: misc
+    dest: misc
+  become: True
+
+
+- lineinfile: dest=/etc/init.d/artifactory
+               state=present
+               regexp='^(.*)</opt(.*)$'
+               line='\1</local/apps\2'
+               backup=yes
+               backrefs=yes 
+  become: True
+
+- lineinfile: dest=/etc/opt/jfrog/artifactory/default
+               state=present
+               regexp='^(.*)TOMCAT_HOME=/opt/(.*)$'
+               line='\1TOMCAT_HOME=/local/apps/\2'
+               backup=yes
+               backrefs=yes
+  become: True
+
+- name: Change the permissions for local/apps/jfrog/artifactory folder
+  file: dest=/local/apps/jfrog/artifactory owner=artifactory group=artifactory
+  become: True
+
+#- name: create a license file
+#  command: mv /home/dharani/artifactory.lic /var/opt/jfrog/artifactory/etc/artifactory.lic
+#  become: True
+
+#- name: restart artifactory
+#  command: echo "handler" 
+#  notify: restart artifactory
+
+#- name: Copy $ARTIFACTORY_HOME/misc/db/postgresql.properties to $ARTIFACTORY_HOME/etc/db.properties  
+#  copy:
+#    src: /local/apps/jfrog/artifactory/misc/db/postgresql.properties
+#    dest: /etc/opt/jfrog/artifactory/db.properties
+#  become: True
+
+
+#- name: Place postgres URL in the db.properties file
+#  command: sed -i "s|localhost|192.168.1.64|" /etc/opt/jfrog/artifactory/db.properties
+#  become: True
+
+#- name: download postgres jdbc server jar file
+#  get_url:
+#    url: https://jdbc.postgresql.org/download/postgresql-9.4.1212.jre6.jar
+#    dest: /local/apps/jfrog/artifactory/tomcat/lib/
+#    owner: artifactory
+#    group: artifactory
+#    mode: 775
+#  become: True 
+
+- name: restart artifactory
+  command: echo "handler"
+  notify: restart artifactory
+
+
+

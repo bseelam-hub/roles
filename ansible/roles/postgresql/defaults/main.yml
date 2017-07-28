@@ -1,0 +1,6 @@
+---
+# defaults file for postgresql
+postgres_user: postgres
+postgres_group: "{{postgres_user}}"
+postgres_data_dir: "/local/apps/pgsql/9.6/data"
+

@@ -1,0 +1,13 @@
+---
+# defaults file for artifactory
+
+artifactory_user: artifactory
+artifactory_group: "{{artifactory_user}}"
+artifactory_home: "/local/apps/jfrog/artifactory"
+artifactory_repo_url: "https://bintray.com/jfrog/artifactory-pro-rpms/rpm"
+artifactory_repo_dir: "/etc/yum.repos.d/bintray-jfrog-artifactory-pro-rpms.repo"
+artifactory_host_name: localhost
+artifactory_http_port: 8081
+
+
+
